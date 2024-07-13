@@ -5,12 +5,13 @@ services:
     container_name: prometheus
     ports:
       - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
       - cadvisor
       - node_exporter
-      - loki
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -22,6 +23,14 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 8081:6379
 
   grafana:
     image: grafana/grafana:latest
@@ -34,32 +43,15 @@ services:
       - prometheus
       - loki
 
-
-#  loki:
-
-#    image: grafana/loki:latest
-#    container_name: loki
-#    ports:
-#      - 3500:3100
-#    volumes:
-#      - ./loki-config.yaml:/etc/loki/loki-config.yaml
-#      - /path/to/loki/data:/var/lib/loki
-#    command: -config.file=/etc/loki/loki-config.yaml
-
   loki:
-    image: grafana/loki:2.9.9
+    image: grafana/loki:latest
+    container_name: loki
     ports:
-      - "3100:3100"
+      - 3100:3100
     volumes:
-      - loki-data:/loki
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki-data:/var/lib/docker/volumes/loki-data
     command: -config.file=/etc/loki/loki-config.yaml
-
-  promtail:
-    image: grafana/promtail:2.9.9
-    volumes:
-      - /var/log:/var/log
-      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
-    command: -config.file=/etc/promtail/promtail-config.yaml
 
   node_exporter:
     image: prom/node-exporter:latest
@@ -70,4 +62,3 @@ services:
 volumes:
   grafana-data:
   loki-data:
-#  promtail-config:
