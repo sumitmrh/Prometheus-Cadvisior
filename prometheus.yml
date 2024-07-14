@@ -17,9 +17,11 @@ scrape_configs:
   - job_name: 'custom-metrics'
     static_configs:
       - targets: ['192.168.1.235:8082']  # Ensure this is a valid hostname
-- job_name: 'sonarqube'
+  
+  - job_name: 'sonarqube-service'
     static_configs:
       - targets: ['192.168.1.231:9000']
-- job_name: 'jenkins'
+
+  - job_name: 'jenkins-service'
     static_configs:
       - targets: ['192.168.1.230:8080']
