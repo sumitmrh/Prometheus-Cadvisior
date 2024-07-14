@@ -10,7 +10,10 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+     volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus/data:/prometheus
+      - ./data/queries.active:/prometheus/data/queries.active
     depends_on:
       - cadvisor
       - node-exporter
